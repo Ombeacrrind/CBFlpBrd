@@ -1,7 +1,7 @@
 ﻿Imports System.Net
 
 Public Class frmFlappyBird
-    Dim localVersion As String = "2.16.2"
+    Dim localVersion As String = "2.16.4"
 
     Dim RED As Color = Color.FromArgb(255, 0, 0)
     Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
@@ -41,9 +41,27 @@ Public Class frmFlappyBird
             'MsgBox("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
 
             If remoteVersion <> localVersion Then
-                MsgBox("New version available - bit.ly/CBFlpBrd2")
+                If MsgBox("New version available - v" & remoteVersion & Environment.NewLine & "Download now?", MsgBoxStyle.YesNo, "Version check") = MsgBoxResult.Yes Then
+                    MsgBox("PS: Your high score might not survive")
+                    'Try
+                    'My.Computer.Network.DownloadFile(New Uri("https://dl-web.dropbox.com/get/FlappyBird.exe?_subject_uid=161393467&amp;w=AADBRWc6Mb4h7doIIfeB3jr-MmdNq3WjuRNY6BuqInwRTA&amp;dl=1"), My.Computer.FileSystem.CurrentDirectory & "\Flappy Brid - new.exe", Nothing, True, 2000, True, FileIO.UICancelOption.ThrowException)
+                    'MsgBox("Delete this file and rename the new version the same as the old. Your high score should be fine")
+                    'Process.Start("explorer.exe", "/select, " & My.Computer.FileSystem.CurrentDirectory & "\Flappy Brid - new.exe")
+                    'Catch ex As Exception
+                    'MsgBox("Unable to download, try navigating to ""bit.ly/CBFlpBrd2""" & Environment.NewLine & ex.Message)
+                    'End Try
+                    Try
+                        Me.Cursor = Cursors.AppStarting
+                        Process.Start("http://bit.ly/CBFlpBrd2")
+                    Catch ex As Exception
+                        MsgBox("Aparently I cant code properly, navigate to bit.ly/CBFlpBrd2")
+                    Finally
+                        Me.Cursor = Nothing
+                        Application.Exit()
+                    End Try
+                End If
             End If
-        Catch
+        Catch ex As Exception
             'MsgBox("Unable to fetch remote version")
         End Try
 
