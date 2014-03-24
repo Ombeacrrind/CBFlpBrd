@@ -1,7 +1,7 @@
 ﻿Imports System.Net
 
 Public Class frmFlappyBird
-    Dim localVersion As String = "2.16.1"
+    Dim localVersion As String = "2.16.2"
 
     Dim RED As Color = Color.FromArgb(255, 0, 0)
     Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
