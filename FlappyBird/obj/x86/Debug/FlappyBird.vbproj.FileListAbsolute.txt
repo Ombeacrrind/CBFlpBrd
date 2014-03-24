@@ -1,0 +1,10 @@
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\bin\Debug\FlappyBird.exe
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\bin\Debug\FlappyBird.pdb
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\bin\Debug\FlappyBird.xml
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.frmFlappyBird.resources
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.Resources.resources
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.vbproj.GenerateResource.Cache
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.exe
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.xml
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\obj\x86\Debug\FlappyBird.pdb
+C:\Users\Shwam\Documents\Visual Studio 2010\Projects\FlappyBird\FlappyBird\bin\Debug\FlappyBird.exe.config
