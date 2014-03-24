@@ -1,5 +1,7 @@
-﻿Public Class frmFlappyBird
-    Dim VERSION As String = "2.15.6"
+﻿Imports System.Net
+
+Public Class frmFlappyBird
+    Dim localVersion As String = "2.16.1"
 
     Dim RED As Color = Color.FromArgb(255, 0, 0)
     Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
@@ -33,6 +35,18 @@
     Dim rnd As New Random
 
     Private Sub frmFlappyBird_Load() Handles MyBase.Load
+        ' Versioning
+        Try
+            Dim remoteVersion As String = New WebClient().DownloadString("https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt")
+            'MsgBox("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
+
+            If remoteVersion <> localVersion Then
+                MsgBox("New version available - bit.ly/CBFlpBrd2")
+            End If
+        Catch
+            'MsgBox("Unable to fetch remote version")
+        End Try
+
         PIPE_HEIGHT = imgPipe1Top.Height
 
         Try
@@ -48,7 +62,7 @@
         lblScore.BringToFront()
         lblHighScore.BringToFront()
 
-        MyBase.Text = "Flappy Bird - v" & VERSION
+        MyBase.Text = "Flappy Bird - v" & localVersion
 
         resetForm()
     End Sub
