@@ -59,6 +59,7 @@ Public Class frmFlappyBird
                         Me.Cursor = Nothing
                         Application.Exit()
                     End Try
+                    Return
                 End If
             End If
         Catch ex As Exception
