@@ -1,7 +1,5 @@
-﻿Imports System.Net
-
-Public Class frmFlappyBird
-    Dim localVersion As String = "2.16.4"
+﻿Public Class frmFlappyBird
+    Dim localVersion As String = "2.16.5"
 
     Dim RED As Color = Color.FromArgb(255, 0, 0)
     Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
@@ -35,13 +33,15 @@ Public Class frmFlappyBird
     Dim rnd As New Random
 
     Private Sub frmFlappyBird_Load() Handles MyBase.Load
-        ' Versioning
+        ' Version control
         Try
-            Dim remoteVersion As String = New WebClient().DownloadString("https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt")
+            Dim remoteVersion As String = New System.Net.WebClient().DownloadString("https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt")
+            Dim remoteBits() As String = remoteVersion.Split(CChar("."))
+            Dim localBits() As String = localVersion.Split(CChar("."))
             'MsgBox("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
 
-            If remoteVersion <> localVersion Then
-                If MsgBox("New version available - v" & remoteVersion & Environment.NewLine & "Download now?", MsgBoxStyle.YesNo, "Version check") = MsgBoxResult.Yes Then
+            If remoteBits(0) > localBits(0) Or remoteBits(1) > localBits(1) Or remoteBits(2) > localBits(2) Then
+                If MsgBox("New version available - v" & remoteVersion & " (Current: v" & localVersion & ")" & Environment.NewLine & "Download now?", MsgBoxStyle.YesNo, "Version check") = MsgBoxResult.Yes Then
                     MsgBox("PS: Your high score might not survive")
                     'Try
                     'My.Computer.Network.DownloadFile(New Uri("https://dl-web.dropbox.com/get/FlappyBird.exe?_subject_uid=161393467&amp;w=AADBRWc6Mb4h7doIIfeB3jr-MmdNq3WjuRNY6BuqInwRTA&amp;dl=1"), My.Computer.FileSystem.CurrentDirectory & "\Flappy Brid - new.exe", Nothing, True, 2000, True, FileIO.UICancelOption.ThrowException)
@@ -54,7 +54,7 @@ Public Class frmFlappyBird
                         Me.Cursor = Cursors.AppStarting
                         Process.Start("http://bit.ly/CBFlpBrd2")
                     Catch ex As Exception
-                        MsgBox("Aparently I cant code properly, navigate to bit.ly/CBFlpBrd2")
+                        MsgBox("Aparently I cant code properly, navigate to bit.ly/CBFlpBrd2", MsgBoxStyle.Exclamation, "Version check")
                     Finally
                         Me.Cursor = Nothing
                         Application.Exit()
