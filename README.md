@@ -1,4 +1,4 @@
 Flappy Bird
 ========
 
-Download <a href="http://www.mediafire.com/download/gvgis9qguft7od2/FlappyBird.exe">here</a>.
+Download <a href="https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1">here</a>.
