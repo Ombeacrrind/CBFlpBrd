@@ -1,5 +1,9 @@
 ﻿Public Class frmFlappyBird
-    Dim localVersion As String = "2.16.5"
+    Dim localVersion As String = "2.16.6"
+    Dim remoteVersionFile As String = "https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt"
+    Dim fileDownloadLocation As String = "https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
+    '"http://download1785.mediafire.com/zvc7b0r2m2cg/gvgis9qguft7od2/FlappyBird.exe"
+    '"https://copy.com/ViLgHdgBtflJ/FlappyBird.exe?download=1"
 
     Dim RED As Color = Color.FromArgb(255, 0, 0)
     Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
@@ -35,30 +39,38 @@
     Private Sub frmFlappyBird_Load() Handles MyBase.Load
         ' Version control
         Try
-            Dim remoteVersion As String = New System.Net.WebClient().DownloadString("https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt")
+            Dim remoteVersion As String = New System.Net.WebClient().DownloadString(remoteVersionFile)
             Dim remoteBits() As String = remoteVersion.Split(CChar("."))
             Dim localBits() As String = localVersion.Split(CChar("."))
             'MsgBox("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
 
             If remoteBits(0) > localBits(0) Or remoteBits(1) > localBits(1) Or remoteBits(2) > localBits(2) Then
-                If MsgBox("New version available - v" & remoteVersion & " (Current: v" & localVersion & ")" & Environment.NewLine & "Download now?", MsgBoxStyle.YesNo, "Version check") = MsgBoxResult.Yes Then
-                    MsgBox("PS: Your high score might not survive")
-                    'Try
-                    'My.Computer.Network.DownloadFile(New Uri("https://dl-web.dropbox.com/get/FlappyBird.exe?_subject_uid=161393467&amp;w=AADBRWc6Mb4h7doIIfeB3jr-MmdNq3WjuRNY6BuqInwRTA&amp;dl=1"), My.Computer.FileSystem.CurrentDirectory & "\Flappy Brid - new.exe", Nothing, True, 2000, True, FileIO.UICancelOption.ThrowException)
-                    'MsgBox("Delete this file and rename the new version the same as the old. Your high score should be fine")
-                    'Process.Start("explorer.exe", "/select, " & My.Computer.FileSystem.CurrentDirectory & "\Flappy Brid - new.exe")
-                    'Catch ex As Exception
-                    'MsgBox("Unable to download, try navigating to ""bit.ly/CBFlpBrd2""" & Environment.NewLine & ex.Message)
-                    'End Try
+                If MsgBox("New version available - v" & remoteVersion & " (Current: v" & localVersion & ")" & Environment.NewLine & "Download now?" & _
+                          Environment.NewLine & "PS: Your high score might not survive", MsgBoxStyle.YesNo, "Version check") = MsgBoxResult.Yes Then
                     Try
                         Me.Cursor = Cursors.AppStarting
-                        Process.Start("http://bit.ly/CBFlpBrd2")
+                        My.Computer.Network.DownloadFile(New Uri(fileDownloadLocation), My.Computer.FileSystem.CurrentDirectory & "\Flappy Bird - new.exe", _
+                                   Nothing, True, 2000, True, FileIO.UICancelOption.ThrowException)
+                        'MsgBox("Delete this file and rename the new version the same as the old. Your high score should be fine")
+                        Process.Start("explorer.exe", "/select, " & My.Computer.FileSystem.CurrentDirectory & "\Flappy Bird - new.exe")
                     Catch ex As Exception
-                        MsgBox("Aparently I cant code properly, navigate to bit.ly/CBFlpBrd2", MsgBoxStyle.Exclamation, "Version check")
+                        My.Computer.Clipboard.SetText(fileDownloadLocation)
+                        MsgBox("Unable to download, try navigating to the link placed on your clipboard", Nothing, "Version check")
                     Finally
                         Me.Cursor = Nothing
                         Application.Exit()
                     End Try
+
+                    'Try
+                    '    
+                    '    Process.Start(fileDownloadLocation)
+                    'Catch ex As Exception
+                    '    My.Computer.Clipboard.SetText(fileDownloadLocation)
+                    '    MsgBox("Aparently I cant code properly, navigate to " & fileDownloadLocation & Environment.NewLine & "(link placed on clipboard)", MsgBoxStyle.Exclamation, "Version check")
+                    'Finally
+                    '   Me.Cursor = Nothing
+                    '   Application.Exit()
+                    'End Try
                     Return
                 End If
             End If
@@ -88,7 +100,7 @@
 
     Private Sub resetForm()
         imgBird.Location = New System.Drawing.Point(100, 133)
-        imgGround.Location = New System.Drawing.Point(0, 294)
+        imgGround.Left = 0
 
         imgPipe1Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
         imgPipe2Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
@@ -262,9 +274,9 @@
         Dim newX As Integer = imgGround.Location.X - 4
 
         If newX <= -499 Then
-            imgGround.Location = New System.Drawing.Point(0, imgGround.Location.Y)
+            imgGround.Left = 0
         Else
-            imgGround.Location = New System.Drawing.Point(newX, imgGround.Location.Y)
+            imgGround.Left = newX
         End If
     End Sub
 
@@ -494,7 +506,7 @@
 
         If lblScore.BackColor = GREEN Then
             Try
-                Dim bmp As New Bitmap(504, 354)
+                Dim bmp As New Bitmap(MyBase.Width + 10, MyBase.Height + 10)
                 Dim graph As Graphics = Graphics.FromImage(bmp)
 
                 graph.CopyFromScreen(Me.Location.X - 5, Me.Location.Y - 5, 0, 0, bmp.Size)
@@ -541,7 +553,7 @@
     End Sub
 
     Private Sub centreLabels() Handles lblHighScore.TextChanged, lblScore.TextChanged
-        lblScore.Location = New Point(CInt((484 - lblScore.Width) / 2), lblScore.Location.Y)
-        lblHighScore.Location = New Point(CInt((484 - lblHighScore.Width) / 2), lblHighScore.Location.Y)
+        lblScore.Location = New Point(CInt((MyBase.ClientSize.Width - lblScore.Width) / 2), lblScore.Location.Y)
+        lblHighScore.Location = New Point(CInt((MyBase.ClientSize.Width - lblHighScore.Width) / 2), lblHighScore.Location.Y)
     End Sub
 End Class

@@ -81,7 +81,7 @@ Partial Class frmFlappyBird
         'imgGround
         '
         Me.imgGround.Image = Global.FlappyBird.My.Resources.Resources.Ground
-        Me.imgGround.Location = New System.Drawing.Point(0, 294)
+        Me.imgGround.Location = New System.Drawing.Point(0, 283)
         Me.imgGround.Name = "imgGround"
         Me.imgGround.Size = New System.Drawing.Size(1000, 20)
         Me.imgGround.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
@@ -237,7 +237,7 @@ Partial Class frmFlappyBird
         Me.BackgroundImage = Global.FlappyBird.My.Resources.Resources.Background
         Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.CausesValidation = False
-        Me.ClientSize = New System.Drawing.Size(484, 312)
+        Me.ClientSize = New System.Drawing.Size(474, 302)
         Me.Controls.Add(Me.lblHighScore)
         Me.Controls.Add(Me.lblScore)
         Me.Controls.Add(Me.imgGround)
@@ -255,10 +255,11 @@ Partial Class frmFlappyBird
         Me.Controls.Add(Me.imgDeath)
         Me.Cursor = System.Windows.Forms.Cursors.Hand
         Me.DoubleBuffered = True
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MaximizeBox = False
+        Me.MaximumSize = New System.Drawing.Size(490, 340)
+        Me.MinimumSize = New System.Drawing.Size(490, 340)
         Me.Name = "frmFlappyBird"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Flappy Bird"
