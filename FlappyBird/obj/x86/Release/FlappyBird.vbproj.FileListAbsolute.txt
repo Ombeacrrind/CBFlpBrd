@@ -12,3 +12,6 @@ C:\Users\Shwam\Documents\GitHub\CBFlpBrd\FlappyBird\obj\x86\Release\FlappyBird.R
 C:\Users\Shwam\Documents\GitHub\CBFlpBrd\FlappyBird\obj\x86\Release\FlappyBird.vbproj.GenerateResource.Cache
 C:\Users\Shwam\Documents\GitHub\CBFlpBrd\FlappyBird\obj\x86\Release\FlappyBird.exe
 C:\Users\Shwam\Documents\GitHub\CBFlpBrd\FlappyBird\obj\x86\Release\FlappyBird.xml
+C:\Users\Shwam\Copy cambird@f2s.com\FlappyBird.exe.config
+C:\Users\Shwam\Copy cambird@f2s.com\FlappyBird.exe
+C:\Users\Shwam\Copy cambird@f2s.com\FlappyBird.xml

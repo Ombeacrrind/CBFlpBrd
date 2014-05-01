@@ -1,40 +1,43 @@
 ﻿Public Class frmFlappyBird
-    Dim localVersion As String = "2.16.6"
-    Dim remoteVersionFile As String = "https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt"
-    Dim fileDownloadLocation As String = "https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
+    Private Const localVersion As String = "2.16.7"
+    Private Const remoteVersionFile As String = "https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt"
+    Private Const fileDownloadLocation As String = "https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
     '"http://download1785.mediafire.com/zvc7b0r2m2cg/gvgis9qguft7od2/FlappyBird.exe"
     '"https://copy.com/ViLgHdgBtflJ/FlappyBird.exe?download=1"
 
-    Dim RED As Color = Color.FromArgb(255, 0, 0)
-    Dim YELLOW As Color = Color.FromArgb(230, 230, 0)
-    Dim GREEN As Color = Color.FromArgb(0, 155, 0)
+    Private noclip As Boolean = False
 
-    Dim PIPE_HEIGHT As Integer
-    Dim PIPE_TOP_OFFSET As Integer = 175
-    Dim PIPE_BOTTOM_OFFSET As Integer = 305
+    Private RED As Color = Color.FromArgb(255, 0, 0)
+    Private YELLOW As Color = Color.FromArgb(230, 230, 0)
+    Private GREEN As Color = Color.FromArgb(0, 155, 0)
 
-    Dim birdYVelocity As Integer = 0
+    Private PIPE_HEIGHT As Integer
+    Private PIPE_TOP_OFFSET As Integer = 175
+    Private PIPE_BOTTOM_OFFSET As Integer = 305
+    Private PIPE_STEP As Integer = 4
 
-    Dim birdFrame As Integer = 3
-    Dim pipeFrame As Integer = 0
+    Private birdYVelocity As Integer = 0
 
-    Dim lastPipe As Integer = 4
-    Dim updatePipe1 As Boolean = False
-    Dim updatePipe2 As Boolean = False
-    Dim updatePipe3 As Boolean = False
-    Dim updatePipe4 As Boolean = False
-    Dim pipe1Scored As Boolean = False
-    Dim pipe2Scored As Boolean = False
-    Dim pipe3Scored As Boolean = False
-    Dim pipe4Scored As Boolean = False
+    Private birdFrame As Integer = 3
+    Private pipeFrame As Integer = 0
+
+    Private lastPipe As Integer = 4
+    Private updatePipe1 As Boolean = False
+    Private updatePipe2 As Boolean = False
+    Private updatePipe3 As Boolean = False
+    Private updatePipe4 As Boolean = False
+    Private pipe1Scored As Boolean = False
+    Private pipe2Scored As Boolean = False
+    Private pipe3Scored As Boolean = False
+    Private pipe4Scored As Boolean = False
 
     Dim currImg As String = "Bird"
     Dim lastImg As String = "Bird2"
 
-    Dim gameOver As Boolean = True
-    Dim canStartGame As Boolean = True
+    Private gameOver As Boolean = True
+    Private canStartGame As Boolean = True
 
-    Dim rnd As New Random
+    Protected Friend rnd As New Random
 
     Private Sub frmFlappyBird_Load() Handles MyBase.Load
         ' Version control
@@ -42,7 +45,7 @@
             Dim remoteVersion As String = New System.Net.WebClient().DownloadString(remoteVersionFile)
             Dim remoteBits() As String = remoteVersion.Split(CChar("."))
             Dim localBits() As String = localVersion.Split(CChar("."))
-            'MsgBox("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
+            DebugMsg("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
 
             If remoteBits(0) > localBits(0) Or remoteBits(1) > localBits(1) Or remoteBits(2) > localBits(2) Then
                 If MsgBox("New version available - v" & remoteVersion & " (Current: v" & localVersion & ")" & Environment.NewLine & "Download now?" & _
@@ -75,7 +78,7 @@
                 End If
             End If
         Catch ex As Exception
-            'MsgBox("Unable to fetch remote version")
+            DebugMsg("Unable to fetch remote version")
         End Try
 
         PIPE_HEIGHT = imgPipe1Top.Height
@@ -85,6 +88,7 @@
         Catch ex As Exception
             lblHighScore.Text = "0"
             MsgBox("High score cannot be saved:" & Environment.NewLine & ex.Message, MsgBoxStyle.Exclamation)
+            My.Computer.Clipboard.SetText(ex.Message & Environment.NewLine & ex.InnerException.ToString)
         End Try
         centreLabels()
 
@@ -93,7 +97,11 @@
         lblScore.BringToFront()
         lblHighScore.BringToFront()
 
-        MyBase.Text = "Flappy Bird - v" & localVersion
+        If My.Application.CommandLineArgs().Contains("-cheat") Then
+            setCheat(True)
+        Else
+            MyBase.Text = "Flappy Bird - v" & localVersion
+        End If
 
         resetForm()
     End Sub
@@ -120,14 +128,6 @@
         pipe2Scored = False
         pipe3Scored = False
         pipe4Scored = False
-
-        'If lblHighScore.Text < 10 Then
-        '    lblHighScore.BackColor = RED
-        'ElseIf lblScore.Text >= 10 And lblHighScore.Text < 20 Then
-        '    lblHighScore.BackColor = YELLOW
-        'Else
-        '    lblHighScore.BackColor = GREEN
-        'End If
     End Sub
 
     Private Sub UpdateTimer_Tick() Handles UpdateTimer.Tick
@@ -156,14 +156,6 @@
 
     Private Sub movementBird()
         Dim newY As Integer = CInt(imgBird.Location.Y - Math.Round(birdYVelocity))
-
-        'If goUp Then
-        '    If newY <= 1 Then
-        '        birdYVelocity = 0
-        '    Else
-        '        birdYVelocity = 9
-        '    End If
-        'End If
 
         If newY < 1 Then
             birdYVelocity = 0
@@ -283,7 +275,7 @@
     Private Sub movementPipes()
         Dim newX As Integer
 
-        If pipeFrame = 40 Then
+        If pipeFrame >= 40 Then
             pipeFrame = 0
 
             Select Case lastPipe
@@ -309,12 +301,12 @@
                     Exit Select
             End Select
         Else
-            pipeFrame = pipeFrame + 1
+            pipeFrame = pipeFrame + CInt(Math.Ceiling(PIPE_STEP / 4))
         End If
 
         ' Pipe 1
         If updatePipe1 Then
-            newX = imgPipe1Top.Location.X - 4
+            newX = imgPipe1Top.Location.X - PIPE_STEP
             If newX <= -32 Then
                 imgPipe1Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
                 imgPipe1Bottom.Location = New System.Drawing.Point(500, imgPipe1Top.Location.Y + PIPE_BOTTOM_OFFSET)
@@ -331,17 +323,19 @@
                 pipe1Scored = True
             End If
 
-            If imgPipe1Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe1Top.Location.X + imgPipe1Top.Width - 1 >= imgBird.Location.X Then
-                If imgBird.Location.Y <= imgPipe1Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe1Bottom.Location.Y + 2 Then
-                    endGame("pipe")
-                    Return
+            If Not noclip Then
+                If imgPipe1Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe1Top.Location.X + imgPipe1Top.Width - 1 >= imgBird.Location.X Then
+                    If imgBird.Location.Y <= imgPipe1Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe1Bottom.Location.Y + 2 Then
+                        endGame("pipe")
+                        Return
+                    End If
                 End If
             End If
         End If
 
         ' Pipe 2
         If updatePipe2 Then
-            newX = imgPipe2Top.Location.X - 4
+            newX = imgPipe2Top.Location.X - PIPE_STEP
             If newX <= -32 Then
                 imgPipe2Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
                 imgPipe2Bottom.Location = New System.Drawing.Point(500, imgPipe2Top.Location.Y + PIPE_BOTTOM_OFFSET)
@@ -358,17 +352,19 @@
                 pipe2Scored = True
             End If
 
-            If imgPipe2Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe2Top.Location.X + imgPipe2Top.Width - 1 >= imgBird.Location.X Then
-                If imgBird.Location.Y <= imgPipe2Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe2Bottom.Location.Y + 2 Then
-                    endGame("pipe")
-                    Return
+            If Not noclip Then
+                If imgPipe2Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe2Top.Location.X + imgPipe2Top.Width - 1 >= imgBird.Location.X Then
+                    If imgBird.Location.Y <= imgPipe2Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe2Bottom.Location.Y + 2 Then
+                        endGame("pipe")
+                        Return
+                    End If
                 End If
             End If
         End If
 
         ' Pipe 3
         If updatePipe3 Then
-            newX = imgPipe3Top.Location.X - 4
+            newX = imgPipe3Top.Location.X - PIPE_STEP
             If newX <= -32 Then
                 imgPipe3Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
                 imgPipe3Bottom.Location = New System.Drawing.Point(500, imgPipe3Top.Location.Y + PIPE_BOTTOM_OFFSET)
@@ -385,17 +381,19 @@
                 pipe3Scored = True
             End If
 
-            If imgPipe3Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe3Top.Location.X + imgPipe3Top.Width - 1 >= imgBird.Location.X Then
-                If imgBird.Location.Y <= imgPipe3Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe3Bottom.Location.Y + 2 Then
-                    endGame("pipe")
-                    Return
+            If Not noclip Then
+                If imgPipe3Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe3Top.Location.X + imgPipe3Top.Width - 1 >= imgBird.Location.X Then
+                    If imgBird.Location.Y <= imgPipe3Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe3Bottom.Location.Y + 2 Then
+                        endGame("pipe")
+                        Return
+                    End If
                 End If
             End If
         End If
 
         ' Pipe 4
         If updatePipe4 Then
-            newX = imgPipe4Top.Location.X - 4
+            newX = imgPipe4Top.Location.X - PIPE_STEP
             If newX <= -31 Then
                 imgPipe4Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
                 imgPipe4Bottom.Location = New System.Drawing.Point(500, imgPipe4Top.Location.Y + PIPE_BOTTOM_OFFSET)
@@ -412,10 +410,12 @@
                 pipe4Scored = True
             End If
 
-            If imgPipe4Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe4Top.Location.X + imgPipe4Top.Width - 1 >= imgBird.Location.X Then
-                If imgBird.Location.Y <= imgPipe4Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe4Bottom.Location.Y + 2 Then
-                    endGame("pipe")
-                    Return
+            If Not noclip Then
+                If imgPipe4Top.Location.X + 1 <= imgBird.Location.X + imgBird.Width And imgPipe4Top.Location.X + imgPipe4Top.Width - 1 >= imgBird.Location.X Then
+                    If imgBird.Location.Y <= imgPipe4Top.Location.Y + PIPE_HEIGHT - 2 Or imgBird.Location.Y + imgBird.Height >= imgPipe4Bottom.Location.Y + 2 Then
+                        endGame("pipe")
+                        Return
+                    End If
                 End If
             End If
         End If
@@ -471,7 +471,6 @@
             lblScore.Text = "0"
             centreLabels()
         Else
-            'goUp = True
             birdYVelocity = 9
         End If
     End Sub
@@ -487,6 +486,8 @@
         ElseIf e.KeyValue = 80 Or e.KeyValue = 112 Then
             imgPause_Click()
             e.Handled = True
+        ElseIf e.KeyValue = 223 Then
+            setCheat(Not noclip)
         End If
     End Sub
 
@@ -514,12 +515,13 @@
                 ' Save a Screenshot to file
                 Dim filePath As String = My.Computer.FileSystem.CurrentDirectory & "\HighScore.png"
                 bmp.Save(filePath)
-                'MsgBox("Screensot saved to """ & filePath & """" & Environment.NewLine & "Open file?", MsgBoxStyle.YesNo, )
+
+                DebugMsg("Screensot saved to """ & filePath & """")
 
                 bmp.Dispose()
                 graph.Dispose()
             Catch ex As Exception
-                'MsgBox(ex.Message)
+                DebugMsg(ex.Message)
             End Try
         End If
         UpdateTimer.Enabled = True
@@ -548,6 +550,7 @@
     Private Sub lblHighScore_Click() Handles lblHighScore.Click
         If MsgBox("Reset high score?", MsgBoxStyle.YesNo) = 6 Then
             lblHighScore.Text = "0"
+            centreLabels()
             My.Settings.highScore = 0
         End If
     End Sub
@@ -555,5 +558,22 @@
     Private Sub centreLabels() Handles lblHighScore.TextChanged, lblScore.TextChanged
         lblScore.Location = New Point(CInt((MyBase.ClientSize.Width - lblScore.Width) / 2), lblScore.Location.Y)
         lblHighScore.Location = New Point(CInt((MyBase.ClientSize.Width - lblHighScore.Width) / 2), lblHighScore.Location.Y)
+    End Sub
+
+    Private Sub DebugMsg(ByVal msg As String)
+        If My.Application.CommandLineArgs().Contains("-debug") Then
+            MsgBox(msg)
+        End If
+    End Sub
+
+    Private Sub setCheat(ByVal cheat As Boolean)
+        noclip = cheat
+        If cheat Then
+            PIPE_STEP = 10
+            MyBase.Text = "Flappy Bird - v" & localVersion & " - Cheating"
+        Else
+            PIPE_STEP = 4
+            MyBase.Text = "Flappy Bird - v" & localVersion
+        End If
     End Sub
 End Class
