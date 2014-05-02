@@ -1,9 +1,9 @@
 ﻿Public Class frmFlappyBird
-    Private Const localVersion As String = "2.16.7"
+    Private Const localVersion As String = "2.16.8"
     Private Const remoteVersionFile As String = "https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt"
-    Private Const fileDownloadLocation As String = "https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
+    Private Const fileDownloadLocation As String = "https://copy.com/ViLgHdgBtflJ/FlappyBird.exe?download=1"
     '"http://download1785.mediafire.com/zvc7b0r2m2cg/gvgis9qguft7od2/FlappyBird.exe"
-    '"https://copy.com/ViLgHdgBtflJ/FlappyBird.exe?download=1"
+    '"https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
 
     Private noclip As Boolean = False
 
@@ -13,7 +13,7 @@
 
     Private PIPE_HEIGHT As Integer
     Private PIPE_TOP_OFFSET As Integer = 175
-    Private PIPE_BOTTOM_OFFSET As Integer = 305
+    Private PIPE_BOTTOM_OFFSET As Integer = 303
     Private PIPE_STEP As Integer = 4
 
     Private birdYVelocity As Integer = 0
@@ -31,11 +31,12 @@
     Private pipe3Scored As Boolean = False
     Private pipe4Scored As Boolean = False
 
-    Dim currImg As String = "Bird"
-    Dim lastImg As String = "Bird2"
+    Private currImg As String = "Bird"
+    Private lastImg As String = "Bird2"
 
     Private gameOver As Boolean = True
     Private canStartGame As Boolean = True
+    Private cheatCurrGame As Boolean = False
 
     Protected Friend rnd As New Random
 
@@ -45,7 +46,7 @@
             Dim remoteVersion As String = New System.Net.WebClient().DownloadString(remoteVersionFile)
             Dim remoteBits() As String = remoteVersion.Split(CChar("."))
             Dim localBits() As String = localVersion.Split(CChar("."))
-            DebugMsg("Local: " & localVersion & Environment.NewLine & "Remote: " & remoteVersion)
+            DebugMsg("Local:	" & localVersion & Environment.NewLine & "Remote:	" & remoteVersion)
 
             If remoteBits(0) > localBits(0) Or remoteBits(1) > localBits(1) Or remoteBits(2) > localBits(2) Then
                 If MsgBox("New version available - v" & remoteVersion & " (Current: v" & localVersion & ")" & Environment.NewLine & "Download now?" & _
@@ -63,18 +64,6 @@
                         Me.Cursor = Nothing
                         Application.Exit()
                     End Try
-
-                    'Try
-                    '    
-                    '    Process.Start(fileDownloadLocation)
-                    'Catch ex As Exception
-                    '    My.Computer.Clipboard.SetText(fileDownloadLocation)
-                    '    MsgBox("Aparently I cant code properly, navigate to " & fileDownloadLocation & Environment.NewLine & "(link placed on clipboard)", MsgBoxStyle.Exclamation, "Version check")
-                    'Finally
-                    '   Me.Cursor = Nothing
-                    '   Application.Exit()
-                    'End Try
-                    Return
                 End If
             End If
         Catch ex As Exception
@@ -110,15 +99,15 @@
         imgBird.Location = New System.Drawing.Point(100, 133)
         imgGround.Left = 0
 
-        imgPipe1Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
-        imgPipe2Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
-        imgPipe3Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
-        imgPipe4Top.Location = New System.Drawing.Point(500, rnd.Next(140) - 175)
+        imgPipe1Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
+        imgPipe2Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
+        imgPipe3Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
+        imgPipe4Top.Location = New System.Drawing.Point(500, rnd.Next(140) - PIPE_TOP_OFFSET)
 
-        imgPipe1Bottom.Location = New System.Drawing.Point(500, imgPipe1Top.Location.Y + 303)
-        imgPipe2Bottom.Location = New System.Drawing.Point(500, imgPipe2Top.Location.Y + 303)
-        imgPipe3Bottom.Location = New System.Drawing.Point(500, imgPipe3Top.Location.Y + 303)
-        imgPipe4Bottom.Location = New System.Drawing.Point(500, imgPipe4Top.Location.Y + 303)
+        imgPipe1Bottom.Location = New System.Drawing.Point(500, imgPipe1Top.Location.Y + PIPE_BOTTOM_OFFSET)
+        imgPipe2Bottom.Location = New System.Drawing.Point(500, imgPipe2Top.Location.Y + PIPE_BOTTOM_OFFSET)
+        imgPipe3Bottom.Location = New System.Drawing.Point(500, imgPipe3Top.Location.Y + PIPE_BOTTOM_OFFSET)
+        imgPipe4Bottom.Location = New System.Drawing.Point(500, imgPipe4Top.Location.Y + PIPE_BOTTOM_OFFSET)
 
         updatePipe1 = False
         updatePipe2 = False
@@ -422,33 +411,31 @@
     End Sub
 
     Private Sub updateLabels()
-        If CInt(lblScore.Text) > CInt(lblHighScore.Text) Then
+        If Not cheatCurrGame And CInt(lblScore.Text) > CInt(lblHighScore.Text) Then
             lblHighScore.Text = lblScore.Text
             centreLabels()
+
             Try
                 My.Settings.highScore = CInt(lblHighScore.Text)
             Catch ex As Exception
+                DebugMsg(ex.Message)
             End Try
         End If
 
-        If CInt(lblScore.Text) < Math.Ceiling(CInt(lblHighScore.Text) / 2) Then
+        If CInt(lblScore.Text) <= 0 Or CInt(lblScore.Text) < Math.Ceiling(CInt(lblHighScore.Text) / 2) Then
             lblScore.BackColor = RED
         ElseIf CInt(lblScore.Text) >= Math.Ceiling(CInt(lblHighScore.Text) / 2) And CInt(lblScore.Text) < CInt(lblHighScore.Text) Then
             lblScore.BackColor = YELLOW
         ElseIf CInt(lblScore.Text) >= CInt(lblHighScore.Text) Then
             lblScore.BackColor = GREEN
         End If
-
-        'If lblHighScore.Text < 10 Then
-        '    lblHighScore.BackColor = RED
-        'ElseIf lblHighScore.Text >= 10 And lblHighScore.Text < 20 Then
-        '    lblHighScore.BackColor = YELLOW
-        'Else
-        '    lblHighScore.BackColor = GREEN
-        'End If
     End Sub
 
-    Private Sub frmFlappyBird_Click() Handles MyBase.Click, imgPipe1Top.Click, imgPipe1Bottom.Click, imgPipe2Top.Click, imgPipe2Bottom.Click, imgPipe3Top.Click, imgPipe3Bottom.Click, imgPipe4Top.Click, imgPipe3Bottom.Click, imgBird.Click, lblScore.Click
+    Private Sub frmFlappyBird_Click() Handles MyBase.Click, imgPipe1Top.Click, imgPipe1Bottom.Click, imgPipe2Top.Click, imgPipe2Bottom.Click, imgPipe3Top.Click, _
+        imgPipe3Bottom.Click, imgPipe4Top.Click, imgPipe3Bottom.Click, imgBird.Click, lblScore.Click
+
+        birdYVelocity = 9
+
         If canStartGame Then
             canStartGame = False
             gameOver = False
@@ -470,29 +457,34 @@
 
             lblScore.Text = "0"
             centreLabels()
-        Else
-            birdYVelocity = 9
         End If
     End Sub
-
     Private Sub frmFlappyBird_KeyDown(sender As System.Object, e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = 32 Then
             If Not UpdateTimer.Enabled Then
-                imgPause_Click()
+                pause()
             End If
 
             frmFlappyBird_Click()
             e.Handled = True
         ElseIf e.KeyValue = 80 Or e.KeyValue = 112 Then
-            imgPause_Click()
+            pause()
             e.Handled = True
         ElseIf e.KeyValue = 223 Then
             setCheat(Not noclip)
         End If
     End Sub
 
-    Private Sub imgPause_Click() Handles imgPause.Click, MyBase.Deactivate
-        If Not gameOver And UpdateTimer.Enabled Then
+    Private Sub frmFlappyBird_Deactivate() Handles MyBase.Deactivate
+        pause(True)
+    End Sub
+
+    Private Sub imgPause_Click() Handles imgPause.Click
+        pause()
+    End Sub
+
+    Private Sub pause(Optional ByVal pause As Boolean = Nothing)
+        If pause Or Not gameOver And UpdateTimer.Enabled Then
             UpdateTimer.Enabled = False
             imgPause.Image = My.Resources.Paused
         Else
@@ -501,29 +493,27 @@
         End If
     End Sub
 
-    Private Sub endGame(Optional ByVal type As String = "")
-        UpdateTimer.Interval = 1000
-        UpdateTimer.Enabled = False
-
-        If lblScore.BackColor = GREEN Then
+    Private Sub endGame(ByVal type As String)
+        If Not cheatCurrGame And lblScore.BackColor = GREEN And CInt(lblHighScore.Text) > 0 Then
             Try
-                Dim bmp As New Bitmap(MyBase.Width + 10, MyBase.Height + 10)
-                Dim graph As Graphics = Graphics.FromImage(bmp)
+                Dim bmp As New Bitmap(MyBase.Width, MyBase.Height)
+                Dim graphic As Graphics = Graphics.FromImage(bmp)
 
-                graph.CopyFromScreen(Me.Location.X - 5, Me.Location.Y - 5, 0, 0, bmp.Size)
+                graphic.CopyFromScreen(Me.Location.X, Me.Location.Y, 0, 0, MyBase.Size)
 
-                ' Save a Screenshot to file
                 Dim filePath As String = My.Computer.FileSystem.CurrentDirectory & "\HighScore.png"
                 bmp.Save(filePath)
 
                 DebugMsg("Screensot saved to """ & filePath & """")
 
                 bmp.Dispose()
-                graph.Dispose()
+                graphic.Dispose()
             Catch ex As Exception
                 DebugMsg(ex.Message)
             End Try
         End If
+
+        UpdateTimer.Interval = 1000
         UpdateTimer.Enabled = True
         Select Case type
             Case "floor"
@@ -533,8 +523,13 @@
                 imgDeath.Image = My.Resources.pipeDeath
                 imgDeath.Visible = True
         End Select
+
         gameOver = True
         canStartGame = False
+
+        cheatCurrGame = False
+        setCheat(False)
+
         centreLabels()
     End Sub
 
@@ -548,7 +543,7 @@
     End Sub
 
     Private Sub lblHighScore_Click() Handles lblHighScore.Click
-        If MsgBox("Reset high score?", MsgBoxStyle.YesNo) = 6 Then
+        If MsgBox("Reset high score?", MsgBoxStyle.YesNo) = vbYes Then
             lblHighScore.Text = "0"
             centreLabels()
             My.Settings.highScore = 0
@@ -568,10 +563,12 @@
 
     Private Sub setCheat(ByVal cheat As Boolean)
         noclip = cheat
+
         If cheat Then
+            cheatCurrGame = True
             PIPE_STEP = 10
             MyBase.Text = "Flappy Bird - v" & localVersion & " - Cheating"
-        Else
+        ElseIf Not cheatCurrGame Then
             PIPE_STEP = 4
             MyBase.Text = "Flappy Bird - v" & localVersion
         End If
