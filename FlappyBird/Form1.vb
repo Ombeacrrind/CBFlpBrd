@@ -1,6 +1,6 @@
 ﻿Public Class frmFlappyBird
     Private Const localVersion As String = "2.16.8"
-    Private Const remoteVersionFile As String = "https://raw.githubusercontent.com/Ombeacrrind/CBFlpBrd/master/version.txt"
+    Private Const remoteVersionFile As String = "https://raw.githubusercontent.com/Shwam3/CBFlpBrd/master/version.txt"
     Private Const fileDownloadLocation As String = "https://copy.com/ViLgHdgBtflJ/FlappyBird.exe?download=1"
     '"http://download1785.mediafire.com/zvc7b0r2m2cg/gvgis9qguft7od2/FlappyBird.exe"
     '"https://dl.dropboxusercontent.com/s/ekhvbvdivqeuxd9/FlappyBird.exe?dl=1"
